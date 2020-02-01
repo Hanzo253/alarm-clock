@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Alarm Clock</title>
+    <style>
+      
+      body {
+	  background-color: black;
+      }
+
+      .title {
+	  color: palegreen;
+	  text-align: center;
+      }
+
+      img {
+	  opacity: 0;
+	  position: absolute;
+	  width: 250px;
+	  height: 275px;
+	  top: 50%;
+      }
+
+      .aliens {
+	  top: 50%;
+      }
+
+      .futurama {
+	  top: 50%;
+	  left: 45%;
+      }
+
+      .freshprince {
+	  top: 50%;
+	  left: 70%;
+      }
+
+      h1 {
+	  -webkit-animation: color-change 1s infinite;
+	  -moz-animation: color-change 1s infinite;
+	  -o-animation: color-change 1s infinite;
+	  -ms-animation: color-change 1s infinite;
+	  animation: color-change 1s infinite;
+      }
+
+      @-webkit-keyframes color-change {
+	  0% {
+	      color: palegreen;
+	  }
+	  
+	  50% {
+	      color: deepskyblue;
+	  }
+	  
+	  100% {
+	      color: palegreen;
+	  }
+      }
+      
+      @-moz-keyframes color-change {
+	  0% {
+	      color: palegreen;
+	  }
+	  
+	  50% {
+	      color: deepskyblue;
+	  }
+	  
+	  100% {
+	      color: palegreen;
+	  }
+      }
+      
+      @-ms-keyframes color-change {
+	  0% {
+	      color: palegreen;
+	  }
+	  
+	  50% {
+	      color: deepskyblue;
+	  }
+	  
+	  100% {
+	      color: palegreen;
+	  }
+      }
+      
+      @-o-keyframes color-change {
+	  0% {
+	      color: palegreen;
+	  }
+	  
+	  50% {
+	      color: deepskyblue;
+	  }
+	  
+	  100% {
+	      color: palegreen;
+	  }
+      }
+      
+      @keyframes color-change {
+	  0% {
+	      color: palegreen;
+	  }
+	  
+	  50% {
+	      color: deepskyblue;
+	  }
+	  
+	  100% {
+	      color: palegreen;
+	  }
+      }
+
+      @keyframes blinkingBackground {
+	  0% {
+	      background-color: #483D8B;
+	  }
+
+	  25% {
+	      background-color: #8FBC8F;
+	  }
+
+	  50% {
+	      background-color: #8B0000;
+	  }
+
+	  75% {
+	      background-color: #2F4F4F;
+	  }
+
+	  100% {
+	      background-color: #8B008B;
+	  }
+      }
+      
+    </style>
+  </head>
+  <body>
+    <h1 class="title" id="title">Alarm Clock</h1>
+    <div class="container">
+      <div class="d-flex justify-content-center">
+	<input type="datetime-local" id="alarm-time">
+	<button type="buttton" class="btn btn-success" onclick="setAlarm(this)" id="alarm-button">Set Alarm</button>
+	<div id="alarm-options">
+	  <button type="button" class="btn btn-primary" onclick="snooze()">Snooze for 5 minutes</button>
+	  <button type="button" class="btn btn-danger" id="stop" onclick="stopAlarm()">Turn off Alarm</button>
+	</div>
+      </div>
+    </div>
+    <div class="container">
+      <img src="./Aliens.webp" alt="aliens" class="aliens">
+      <img src="./BenderandTurtle.webp" alt="futurama" class="futurama">
+      <img src="./WillandCarliton.webp" alt="Bel-air" class="freshprince">
+    </div>
+    <script>
+      // alarm variables
+      var alarmMusic = new Audio();
+      alarmMusic.src = "./HOME - Billiards.mp3";
+      var alarmTimer;
+      var blinking;
+      var blinkBackground;
+      var alarmOn;
+
+      // function for setting the alarm
+      function setAlarm(button) {
+	  var milliseconds = document.getElementById("alarm-time").valueAsNumber;
+	  if (isNaN(milliseconds)) {
+	      alert("Invalid Date");
+	      return;
+	  }
+
+	  var alarm = new Date(milliseconds);
+	  var alarmTime = new Date(alarm.getUTCFullYear(), alarm.getUTCMonth(), alarm.getUTCDate(), alarm.getUTCHours(), alarm.getUTCMinutes(), alarm.getUTCSeconds());
+	  var differenceInMilliseconds = alarmTime.getTime() - (new Date()).getTime();
+
+	  if (differenceInMilliseconds < 0) {
+	      alert("Specified time is already passed!");
+	      return;
+	  }
+
+	  alarmTimer = setTimeout(initAlarm, differenceInMilliseconds);
+	  button.innerText = "Cancel Alarm";
+	  button.setAttribute("onclick", "cancelAlarm(this);");
+	  $("#alarm-button").removeClass("btn btn-success").addClass("btn btn-warning");
+
+	  if (alarmOn === true) {
+	      alert("Please turn off the alarm first before setting up another time.");
+	      document.getElementById("alarm-button").innerText = "Set Alarm";
+	      $("#alarm-button").removeClass("btn btn-warning").addClass("btn btn-success");
+	      return;
+	  }
+
+	  $("img").fadeOut();
+      }
+
+      // function for cancel alarm button
+      function cancelAlarm(button) {
+	  button.innerText = "Set Alarm";
+	  button.setAttribute("onclick", "setAlarm(this);");
+	  clearTimeout(alarmTimer);
+	  $("#alarm-button").removeClass("btn btn-warning").addClass("btn btn-success");
+      }
+
+      // functions that plays the alarm's music
+      function initAlarm() {
+	  alarmMusic.play();
+	  document.getElementById("alarm-options").style.display = "";
+	  document.getElementById("title").innerHTML = "Wake Up!";
+	  blinking = setInterval(blinker, 1000);
+	  document.getElementById("alarm-button").innerText = "Set Alarm";
+	  $("#alarm-button").removeClass("btn btn-warning").addClass("btn btn-success");
+	  blinkBackground = document.getElementsByTagName("body")[0];
+	  blinkBackground.style.animation = "blinkingBackground 2s infinite";
+	  alarmOn = true;
+	  $("img").css("opacity", 1);
+	  $("img").fadeIn();
+      }
+
+      // function to stop the alarm
+      function stopAlarm() {
+	  alarmMusic.pause();
+	  alarmMusic.currentTime = 0;
+	  cancelAlarm(document.getElementById("alarm-button"));
+	  document.getElementById("title").innerHTML = "Alarm Clock";
+	  clearInterval(blinking);
+	  blinkBackground = document.getElementsByTagName("body")[0];
+	  blinkBackground.style.animation = "none";
+	  document.body.style.backgroundColor = "black";
+	  alarmOn = false;
+	  $("img").fadeOut();
+      }
+
+      // snooze button function
+      function snooze() {
+	  stopAlarm();
+	  setTimeout(initAlarm, 300000);
+      }
+
+      // blinking effect function
+      function blinker() {
+	  $(".title").fadeOut(500);
+	  $(".title").fadeIn(500);
+      }
+      
+    </script>
+  </body>
+</html>
